@@ -228,7 +228,7 @@ select * into #tercerosPagos from #terceros where numempleado in (select numempl
 
 -- obtener las deducciones de los empleados de terceros 
 
-select * into #deducciones from hist_deducciones_vigente where numempleado in (select numempleado from #tercerosPagos) and qna_proc = @Qna_Proc;
+select * into #deducciones from hist_deducciones where numempleado in (select numempleado from #tercerosPagos) and qna_proc = @Qna_Proc;
 
 -- Obtener a los que no se les pagaron todos los conceptos 
 
