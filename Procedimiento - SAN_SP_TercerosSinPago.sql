@@ -104,7 +104,7 @@ ALTER TABLE #tercerosSinPagos ADD Tramite varchar(max);
 SELECT 
 	DISTINCT oc.id_ocupacion, oc.numempleado into #ocupaciones
 FROM 
-	[172.17.6.83].[HWGTO_SEGV7].dbo.HW_RH_Ocupacion oc
+	HW_RH_Ocupacion oc
 JOIN #tercerosSinPagos e ON oc.numempleado = e.NumEmpleado
 JOIN HW_RH_Plaza p on p.NumPlaza = oc.numplaza 
 JOIN HW_RH_Categoria c on c.Id_Categoria = SUBSTRING(p.NumPlazaAntecedente,7,7) collate database_default
@@ -118,7 +118,7 @@ UPDATE #tercerosSinPagos SET Estatus = 'Baja' WHERE NumEmpleado NOT IN (SELECT N
 -- identificar el estatus de estos empleados para justificar el que no tuvieran pago
 
 SELECT oc.id_ocupacion, MAX(oc.VigenciaInicial) VI into #VigenciasOcupaciones
-FROM [172.17.6.83].[HWGTO_SEGV7].dbo.HW_RH_HistoriaOcupacion oc
+FROM HW_RH_HistoriaOcupacion oc
 JOIN #ocupaciones oc2 on oc2.id_ocupacion = oc.id_ocupacion and oc.Historia = 0
 AND @vi BETWEEN oc.VigenciaInicial AND ISNULL(oc.VigenciaFinal,'9999-12-31')
 GROUP BY oc.id_ocupacion;
@@ -126,7 +126,7 @@ GROUP BY oc.id_ocupacion;
 
 
 SELECT distinct oc2.numempleado, oc.id_estadoOcupacion, oc.id_ret INTO #estadosOc
-FROM [172.17.6.83].[HWGTO_SEGV7].dbo.HW_RH_HistoriaOcupacion oc 
+FROM HW_RH_HistoriaOcupacion oc 
 JOIN #VigenciasOcupaciones voc ON voc.id_ocupacion = oc.id_ocupacion AND voc.VI = oc.VigenciaInicial
 JOIN #ocupaciones oc2 on oc2.id_ocupacion = oc.id_ocupacion
 WHERE oc.VigenciaInicial <> ISNULL(oc.VigenciaFinal,'9999-12-31')
@@ -134,8 +134,8 @@ AND oc.Historia = 0;
 
 select oc.*, t.Nombre as NombreTramite, te.Fecha_operacion into #estadosOc2
 from #estadosOc oc
-JOIN [172.17.6.83].[HWGTO_SEGV7].dbo.HW_VU_TramitesEmpleados te on te.id_ret = oc.id_ret
-JOIN [172.17.6.83].[HWGTO_SEGV7].dbo.HW_RH_Tramite t on t.id_tramite = te.id_tramite;
+JOIN HW_VU_TramitesEmpleados te on te.id_ret = oc.id_ret
+JOIN HW_RH_Tramite t on t.id_tramite = te.id_tramite;
 
 
 
@@ -182,8 +182,8 @@ create index idx1 on #trbajas(id_ret);
 
 select oc.*, t.Nombre as NombreTramite, te.Fecha_operacion into #estadosOc3
 from #trbajas oc
-JOIN [172.17.6.83].[HWGTO_SEGV7].dbo.HW_VU_TramitesEmpleados te on te.id_ret = oc.id_ret AND te.estatus_tramite in ('CONCLUIDO','ENTREGADO')
-JOIN [172.17.6.83].[HWGTO_SEGV7].dbo.HW_RH_Tramite t on t.id_tramite = te.id_tramite;
+JOIN HW_VU_TramitesEmpleados te on te.id_ret = oc.id_ret AND te.estatus_tramite in ('CONCLUIDO','ENTREGADO')
+JOIN HW_RH_Tramite t on t.id_tramite = te.id_tramite;
 
 
 
